@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */; };
+		9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */; };
 		EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA81DAF62BAF402F0024E8CB /* SixthSenseApp.swift */; };
 		EA81DAF92BAF402F0024E8CB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA81DAF82BAF402F0024E8CB /* ContentView.swift */; };
 		EA81DAFB2BAF40300024E8CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA81DAFA2BAF40300024E8CB /* Assets.xcassets */; };
@@ -14,6 +16,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAudioManager.swift; sourceTree = "<group>"; };
 		EA81DAF32BAF402F0024E8CB /* SixthSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SixthSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA81DAF62BAF402F0024E8CB /* SixthSenseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SixthSenseApp.swift; sourceTree = "<group>"; };
 		EA81DAF82BAF402F0024E8CB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -57,6 +61,8 @@
 				EA81DAFA2BAF40300024E8CB /* Assets.xcassets */,
 				EA81DAFC2BAF40300024E8CB /* SixthSense.entitlements */,
 				EA81DAFD2BAF40300024E8CB /* Preview Content */,
+				9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */,
+				9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */,
 			);
 			path = SixthSense;
 			sourceTree = "<group>";
@@ -139,6 +145,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */,
+				9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */,
 				EA81DAF92BAF402F0024E8CB /* ContentView.swift in Sources */,
 				EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */,
 			);
@@ -270,11 +278,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SixthSense/Preview Content\"";
-				DEVELOPMENT_TEAM = 679T2G5882;
+				DEVELOPMENT_TEAM = UA2Y3R3N3Z;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SixthSense;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Depth Perception";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -289,7 +298,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.harmon.SixthSense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.monty.SixthSense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -309,11 +318,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SixthSense/Preview Content\"";
-				DEVELOPMENT_TEAM = 679T2G5882;
+				DEVELOPMENT_TEAM = UA2Y3R3N3Z;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SixthSense;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Depth Perception";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -328,7 +338,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.harmon.SixthSense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.monty.SixthSense;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
