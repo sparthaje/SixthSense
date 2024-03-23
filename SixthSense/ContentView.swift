@@ -25,13 +25,24 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        ViewContainer()
-            .edgesIgnoringSafeArea(.all)
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+            ViewContainer()
+                .edgesIgnoringSafeArea(.all)
+        }
+//        ViewContainer()
+//            .edgesIgnoringSafeArea(.all)
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}
+#Preview {
+    ContentView()
 }

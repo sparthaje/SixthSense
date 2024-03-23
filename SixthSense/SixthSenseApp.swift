@@ -7,18 +7,20 @@
 
 import SwiftUI
 
-//@main
-//struct SixthSenseApp: App {
-//    var body: some Scene {
-//        WindowGroup {
-//            ContentView()
-//        }
-//    }
-//}
-import UIKit
+@main
+struct SixthSenseApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
 
-@UIApplicationMain
-class SixthSenseApp: UIResponder, UIApplicationDelegate {
+
+//import UIKit
+
+//@UIApplicationMain
+//class SixthSenseApp: UIResponder, UIApplicationDelegate {
 
 //    var window: UIWindow?
 //
@@ -65,11 +67,11 @@ class SixthSenseApp: UIResponder, UIApplicationDelegate {
 //    }
 
     
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-
-
-}
+//    var body: some Scene {
+//        WindowGroup {
+//            ContentView()
+//        }
+//    }
+//
+//
+//}
