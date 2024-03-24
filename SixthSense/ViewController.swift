@@ -10,6 +10,8 @@ import Foundation
 import UIKit
 import ARKit
 import simd
+import GoogleGenerativeAI
+import AVFoundation
 
 struct ViewContainer: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> ViewController {
@@ -22,13 +24,20 @@ struct ViewContainer: UIViewControllerRepresentable {
 
 class ViewController: UIViewController, ARSCNViewDelegate {
     var arView: ARSCNView!
-    var spatialAudioManager: SpatialAudioManager!
     var reset_date: Date = Date()
+    var last_ping_date: Date = Date()
     var cloud_num: Int = 0
     let colors = [UIColor.red, UIColor.green, UIColor.orange, UIColor.blue, UIColor.purple, UIColor.cyan]
     var configuration: ARWorldTrackingConfiguration? = nil;
     var options: ARSession.RunOptions? = nil;
     var nearestPointDetector = NearestPointDetector()
+
+    var previousFrame: ARFrame?
+    let model = GenerativeModel(name: "gemini-pro-vision", apiKey: "AIzaSyATZ4h33XqCyMN3yj50vvXupQLAsXD2wIk")
+    let speechSynthesizer = AVSpeechSynthesizer()
+    let soundPlayer = SoundPlayer()
+    var givingContext = false
+    var toggleSpatialAudio = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,9 +47,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         view.addSubview(arView)
         arView.delegate = self
         
-        // Set up SpatialAudioManager
-        spatialAudioManager = SpatialAudioManager()
-        
         // Check if LiDAR is available
         //        spatialAudioManager.playSound(from: <#T##SCNVector3#>, with: <#T##URL#>);
         guard ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) else {
@@ -49,7 +55,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         print("LiDAR is available on this device")
-        
+                
         // Set up ARWorldTrackingConfiguration
         configuration = ARWorldTrackingConfiguration()
         //        configuration!.planeDetection = [.vertical]  // removed .horizontal
@@ -59,12 +65,97 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         options = [.resetTracking, .removeExistingAnchors]
         configuration!.sceneReconstruction = .meshWithClassification
         arView.session.run(configuration!, options: options!)
-        print("Yurrrr")
-    }
         
+        let screenRect = UIScreen.main.bounds
+        let buttonHeight = screenRect.height / 2
+
+        // Create a new button
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: screenRect.width, height: buttonHeight))
+        button.backgroundColor = .black
+        button.setTitle("General Context", for: .normal)
+        button.addTarget(self, action: #selector(topButtonTapped), for: .touchUpInside)
+        view.addSubview(button)
+
+        // Create a new button
+        let button2 = UIButton(frame: CGRect(x: 0, y: buttonHeight, width: screenRect.width, height: buttonHeight))
+        button2.backgroundColor = .black
+        button2.setTitle("Key Objects", for: .normal)
+        button2.addTarget(self, action: #selector(bottomButtonTapped), for: .touchUpInside)
+        view.addSubview(button2)
+
+        let dividerHeight: CGFloat = 2  // You can adjust the thickness of the divider here
+            let divider = UIView(frame: CGRect(x: 0, y: buttonHeight - dividerHeight / 2, width: screenRect.width, height: dividerHeight))
+            divider.backgroundColor = .white
+            view.addSubview(divider)
+    }
+    
+    @objc func bottomButtonTapped() {
+        print("Clicked bottom button")
+        // Perform your desired action here
+        if (previousFrame != nil) {
+            let buffer = previousFrame!.capturedImage;
+            let img = UIImage(ciImage: CIImage(cvPixelBuffer: buffer));
+            givingContext = true
+            let speechUtterance = AVSpeechUtterance(string: "Stop!")
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+            speechSynthesizer.speak(speechUtterance)
+
+            let prompt = "What is the closest key object in the field of view: people, chair, door, and table. Also provide its relative location in the frame (left, center, rigth). Limit response to only 1 sentence."
+            givingContext = true
+            Task {
+                let result = await call_gemini(model: model, img: img, prompt: prompt)!
+                print("API Response: \(result ?? "No output")")
+                let speechUtterance = AVSpeechUtterance(string: result)
+                speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+                speechSynthesizer.speak(speechUtterance)
+            }
+            givingContext = false
+            previousFrame = nil;
+        }
+    }
+    @objc func topButtonTapped() {
+        print("Clicked top button")
+        // Perform your desired action here
+        if (previousFrame != nil) {
+            let buffer = previousFrame!.capturedImage;
+            let img = UIImage(ciImage: CIImage(cvPixelBuffer: buffer));
+            let prompt = "Given the following field of vision, contextualize the environment and provide what the environment could be (living room, classroom, conference room, kitchen, hallway). Keep responses short and within 2 sentences."
+            givingContext = true
+            Task {
+                let result = await call_gemini(model: model, img: img, prompt: prompt)!
+                print("API Response: \(result ?? "No output")")
+                //givingContext = true
+                let speechUtterance = AVSpeechUtterance(string: result)
+                speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+                speechSynthesizer.speak(speechUtterance)
+            }
+            givingContext = false
+            previousFrame = nil;
+        }
+    }
+    
+    func call_gemini(model: GenerativeModel, img: UIImage?, prompt: String) async -> String? {
+        do {
+            let response = try await model.generateContent(prompt, img!);
+            return response.text
+        } catch {
+            print("Error: (error)")
+        }
+        return "No output"
+    }
+
+    func playPing(angle : Double, depth : Double) {
+        if !givingContext {
+            let pan = -2 * angle / Double.pi  //cos(given_angle + Double.pi / 2)
+            soundPlayer.playSound(sound: "biwo", type: "m4a", pan: Float(pan), distance: Float(depth))
+            Thread.sleep(forTimeInterval: 0.1)
+        }
+    }
+
     // ARSCNViewDelegate methods to handle LiDAR data
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         guard let frame = arView.session.currentFrame else { return }
+        previousFrame = frame;
         
         arView.session.getCurrentWorldMap { world_map, e in
             guard let featurePoints = world_map?.rawFeaturePoints else {return}
@@ -81,17 +172,39 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             guard let nearest_points = self.nearestPointDetector.getNearestPoint(points: new_points, minPoints: 7, epsilon: 0.3) else
             {
                 print("There's literally no nearest point bruh")
-                self.displayPointCloud([new_points], referencePoint: referencePoint)
+//                self.displayPointCloud([new_points], referencePoint: referencePoint)
                 return
             }
-            print("Found n nearest points " + String(nearest_points.count))
-            self.displayPointCloud([new_points, nearest_points], referencePoint: referencePoint)
-               
+//            print("Found n nearest points " + String(nearest_points.count))
+//            self.displayPointCloud([new_points, nearest_points], referencePoint: referencePoint)
+
+//            if self.cloud_num % 100 == 0 {
+            var num_points = 0.0
+            var avg_x = 0.0
+            var avg_z = 0.0
+            for point in nearest_points {
+                avg_x += point.x - Double(referencePoint.x)
+                avg_z += point.z - Double(referencePoint.z)
+                num_points += 1.0
+            }
+            avg_x /= num_points
+            avg_z /= num_points
+            let magnitude = sqrt(avg_x * avg_x + avg_z * avg_z)
+            let avg_point_angle = atan2(-avg_z, avg_x)
+            var ping_angle = avg_point_angle - Double(yaw)
+            ping_angle = atan2(sin(ping_angle), cos(ping_angle))
+            
+            let ping_frequency = 1.5
+            if Date().timeIntervalSince(self.last_ping_date) > ping_frequency {
+                self.playPing(angle: Double(ping_angle), depth: magnitude)
+                self.last_ping_date = Date()
+            }
+
             if Date().timeIntervalSince(self.reset_date) > 20 {
                 self.arView.session.pause()
                 self.arView.session.run(self.configuration!, options: self.options!)
                 // reset world
-                print("RESETTING SCENE MOTHER FUCKER")
+                print("RESETTING SCENE")
                 self.reset_date = Date()
             }
         };

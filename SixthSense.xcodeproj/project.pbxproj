@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9F2A2AA12BAF9E4C00B52A2E /* DBSCAN in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */; };
 		9F2A2AA32BAFA35100B52A2E /* NearestPointDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2A2AA22BAFA35100B52A2E /* NearestPointDetector.swift */; };
 		9F2A2AA82BAFA3BF00B52A2E /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AA72BAFA3BF00B52A2E /* KDTree */; };
+		9F2A2AAB2BB0492500B52A2E /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AAA2BB0492500B52A2E /* GoogleGenerativeAI */; };
+		9F2A2AAD2BB04FFF00B52A2E /* biwo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9F2A2AAC2BB04FFF00B52A2E /* biwo.m4a */; };
 		9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */; };
 		9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */; };
 		EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA81DAF62BAF402F0024E8CB /* SixthSenseApp.swift */; };
@@ -20,6 +21,7 @@
 
 /* Begin PBXFileReference section */
 		9F2A2AA22BAFA35100B52A2E /* NearestPointDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearestPointDetector.swift; sourceTree = "<group>"; };
+		9F2A2AAC2BB04FFF00B52A2E /* biwo.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = biwo.m4a; sourceTree = "<group>"; };
 		9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAudioManager.swift; sourceTree = "<group>"; };
 		EA81DAF32BAF402F0024E8CB /* SixthSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SixthSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -35,8 +37,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F2A2AA12BAF9E4C00B52A2E /* DBSCAN in Frameworks */,
 				9F2A2AA82BAFA3BF00B52A2E /* KDTree in Frameworks */,
+				9F2A2AAB2BB0492500B52A2E /* GoogleGenerativeAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +72,7 @@
 				9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */,
 				9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */,
 				9F2A2AA22BAFA35100B52A2E /* NearestPointDetector.swift */,
+				9F2A2AAC2BB04FFF00B52A2E /* biwo.m4a */,
 			);
 			path = SixthSense;
 			sourceTree = "<group>";
@@ -99,8 +102,8 @@
 			);
 			name = SixthSense;
 			packageProductDependencies = (
-				9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */,
 				9F2A2AA72BAFA3BF00B52A2E /* KDTree */,
+				9F2A2AAA2BB0492500B52A2E /* GoogleGenerativeAI */,
 			);
 			productName = SixthSense;
 			productReference = EA81DAF32BAF402F0024E8CB /* SixthSense.app */;
@@ -133,6 +136,7 @@
 			packageReferences = (
 				9F2A2A9F2BAF9E4C00B52A2E /* XCRemoteSwiftPackageReference "DBSCAN" */,
 				9F2A2AA62BAFA3BF00B52A2E /* XCRemoteSwiftPackageReference "KDTree" */,
+				9F2A2AA92BB0492500B52A2E /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
 			);
 			productRefGroup = EA81DAF42BAF402F0024E8CB /* Products */;
 			projectDirPath = "";
@@ -149,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA81DAFF2BAF40300024E8CB /* Preview Assets.xcassets in Resources */,
+				9F2A2AAD2BB04FFF00B52A2E /* biwo.m4a in Resources */,
 				EA81DAFB2BAF40300024E8CB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -405,18 +410,26 @@
 				minimumVersion = 1.4.2;
 			};
 		};
+		9F2A2AA92BB0492500B52A2E /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/generative-ai-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9F2A2A9F2BAF9E4C00B52A2E /* XCRemoteSwiftPackageReference "DBSCAN" */;
-			productName = DBSCAN;
-		};
 		9F2A2AA72BAFA3BF00B52A2E /* KDTree */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9F2A2AA62BAFA3BF00B52A2E /* XCRemoteSwiftPackageReference "KDTree" */;
 			productName = KDTree;
+		};
+		9F2A2AAA2BB0492500B52A2E /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F2A2AA92BB0492500B52A2E /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
