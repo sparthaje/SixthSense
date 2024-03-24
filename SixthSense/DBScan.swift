@@ -44,10 +44,12 @@ class NearestPointDetector {
     func getNearestPoint(points: [SIMD3<Double>], minPoints: Int, epsilon: Double) -> [SIMD3<Double>]? {
         var tree: KDTree<SIMD3<Double>> = KDTree(values: points)
 
-        var clusters: [Set<SIMD3<Double>>] = []
-    
+        var cluster: [SIMD3<Double>] = []
+        var i = 0
         for (index, point) in points.enumerated() {
-    
+            if i == 5 {
+                break;
+            }
             let neighbors: [SIMD3<Double>] = tree.elementsIn([(point.x - epsilon, point.x + epsilon),
                                                                   (point.y - epsilon, point.y + epsilon),
                                                                   (point.z - epsilon, point.z + epsilon)])
@@ -55,11 +57,11 @@ class NearestPointDetector {
             if neighbors.count < minPoints {
                 continue
             }
-            
-            return neighbors
+            cluster.append(point)
+            i += 1;
         }
 
-        return nil
+        return cluster
     }
 }
 

@@ -20,19 +20,12 @@ struct ViewContainer: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {}
 }
 
-struct PointWithCloudNumber {
-    var cloud_num: Int
-    var point: SIMD3<Float>
-}
-
 class ViewController: UIViewController, ARSCNViewDelegate {
     var arView: ARSCNView!
     var spatialAudioManager: SpatialAudioManager!
-    var date: Date!
+    var reset_date: Date = Date()
     var cloud_num: Int = 0
     let colors = [UIColor.red, UIColor.green, UIColor.orange, UIColor.blue, UIColor.purple, UIColor.cyan]
-    var main_lidar_cloud : [PointWithCloudNumber] = []
-    var first_camera_pos: SCNVector3? = nil;
     var configuration: ARWorldTrackingConfiguration? = nil;
     var options: ARSession.RunOptions? = nil;
     var dbscan = DBScan()
@@ -51,7 +44,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Check if LiDAR is available
         //        spatialAudioManager.playSound(from: <#T##SCNVector3#>, with: <#T##URL#>);
-        guard ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) else {
+        guard ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) else {
             print("LiDAR not available on this device")
             return
         }
@@ -65,11 +58,90 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         configuration!.frameSemantics = [.sceneDepth, .smoothedSceneDepth] // Use smoothedSceneDepth for better depth data
         //        configuration.frameSemantics.insert(.sceneDepth)
         options = [.resetTracking, .removeExistingAnchors]
-        configuration!.sceneReconstruction = .mesh
+        configuration!.sceneReconstruction = .meshWithClassification
         arView.session.run(configuration!, options: options!)
         print("Yurrrr")
+    }
         
-        date = Date()
+    // ARSCNViewDelegate methods to handle LiDAR data
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        guard let frame = arView.session.currentFrame else { return }
+        
+        arView.session.getCurrentWorldMap { world_map, e in
+            guard let featurePoints = world_map?.rawFeaturePoints else {return}
+//            print("Num anchors: " + String((world_map?.anchors.count)!))
+//            var anchor_points: [SIMD3<Double>] = []
+//            for anchor in world_map!.anchors {
+//                if let planeAnchor = anchor as? ARPlaneAnchor {
+//                    print("It's a plane anchor")
+//                    print(planeAnchor.classification)
+//                }
+//                else if let meshAnchor = anchor as? ARMeshAnchor {
+//                    print("It's a mesh anchor")
+////                     print("Classification: " + String(meshAnchor.classification))
+//                }
+//                else if let bodyAnchor = anchor as? ARBodyAnchor {
+//                    print("It's a body anchor")
+////                    print(bodyAnchor.classification)
+////                    print("Classification: " + String(bodyAnchor.classification))
+//                }
+//                let position = anchor.transform.columns.3
+//                let simd_pos = SIMD3<Double>(Double(position.x), Double(position.y), Double(position.z))
+//                print(simd_pos)
+//                anchor_points.append(simd_pos)
+////                else if let environmentProbeAnchor = anchor as? AREnvironmentProbeAnchor {
+////                    print("It's an environment probe anchor")
+////                }
+//            }
+//
+//            let clusters = [anchor_points]
+//            self.displayPointCloud(clusters)
+//            
+//            return
+
+            let referencePoint = SCNVector3(
+                frame.camera.transform.columns.3.x,
+                frame.camera.transform.columns.3.y,
+                frame.camera.transform.columns.3.z
+            )
+            let yaw = frame.camera.eulerAngles.y
+            
+            let new_points: [SIMD3<Double>] = self.filter_points(pcl: featurePoints.points, referencePoint: referencePoint, yaw: yaw)
+
+            guard let nearest_points = self.nearestPointDetector.getNearestPoint(points: new_points, minPoints: 7, epsilon: 0.3) else
+            {
+                print("There's literally no nearest point bruh")
+    //            self.displayPointCloud([new_points, nearest_points])
+                self.displayPointCloud([new_points], referencePoint: referencePoint)
+                return
+            }
+//            self.displayPointCloud([new_points, nearest_points])
+            print("Found n nearest points " + String(nearest_points.count))
+            self.displayPointCloud([new_points, nearest_points], referencePoint: referencePoint)
+
+//            if new_points.count > 20 {
+//                let firstHalf = Array(new_points[..<20])
+////                let clusters = [new_points, firstHalf]
+//                let clusters = self.dbscan.clusterPoints(points: new_points, minPoints: 10, epsilon: 1)
+//                //            self.displayPointCloud(new_points)
+//                print("Num clusters: " + String(clusters.count))
+//                for (i, cluster) in clusters.enumerated() {
+//                    print("Cluster " + String(i) + ": " + String(cluster.count))
+//                }
+//                self.displayPointCloud(clusters)
+//            } else {
+//                print("less than 20 LLL")
+//            }
+               
+            if Date().timeIntervalSince(self.reset_date) > 20 {
+//            if (featurePoints.points.count > 5000) {
+                self.arView.session.pause()
+                self.arView.session.run(self.configuration!, options: self.options!)
+                // reset world
+                print("RESETTING SCENE MOTHER FUCKER")
+                self.reset_date = Date()
+            }
+        };
     }
     
     func filter_points(pcl: [simd_float3], referencePoint: SCNVector3, yaw: Float) -> [SIMD3<Double>] {
@@ -89,38 +161,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             num_angle_filtered_points += 1
             
-            // Ground filtering
-            if scnPoint.y <= referencePoint.y - 1.0 {
+//            // Ground filtering
+            if scnPoint.y <= -0.5 {
                 continue
             }
             // Ceiling filtering
-            if scnPoint.y >= referencePoint.y + 0.5 {
+            if scnPoint.y >= -0.1 {
                 continue
             }
             num_ground_filtered_points += 1
             
             // Distance filtering
             let distance = self.distanceBetween2D(scnPoint, and: referencePoint)
-            if distance < 0.5 {
+            if distance < 0.8 {
                 continue
             }
-            if distance > 2 {
+            if distance > 2.0 {
                 continue
             }
-            
+//            
             if distance < minDistance {
                 minDistance = distance
             }
             
             new_points.append(SIMD3<Double>(point))
         }
-        print("Num original points: " + String(num_original_points))
-        print("Num angle filtered points: " + String(num_angle_filtered_points))
-        print("Num ground filtered points: " + String(num_ground_filtered_points))
+//        print("Num original points: " + String(num_original_points))
+//        print("Num angle filtered points: " + String(num_angle_filtered_points))
+//        print("Num ground filtered points: " + String(num_ground_filtered_points))
         print("Num fully filtered points: " + String(new_points.count))
-        print("Min distance: " + String(minDistance))
-        //            let clusters = clusterPoints(points: new_points, minPoints: 5, epsilon: 0.1)
-        //            let clusters = self.dbscan.clusterPoints(points: new_points, minPoints: 5, epsilon: 0.1)
+//        print("Min distance: " + String(minDistance))
         new_points.sort { (pointA, pointB) -> Bool in
             let d1 = self.distanceBetween2D(SCNVector3(
                             pointA.x,
@@ -137,133 +207,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         return new_points;
     }
-    
-    // ARSCNViewDelegate methods to handle LiDAR data
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        guard let frame = arView.session.currentFrame else { return }
-        
-        arView.session.getCurrentWorldMap { world_map, e in
-            guard let featurePoints = world_map?.rawFeaturePoints else {return}
-            
-            let cameraTransform = frame.camera.transform
-            let cameraPosition = self.extractPosition(from: cameraTransform)
-            let referencePoint = SCNVector3(
-                frame.camera.transform.columns.3.x,
-                frame.camera.transform.columns.3.y,
-                frame.camera.transform.columns.3.z
-            )
-            let yaw = frame.camera.eulerAngles.y
-            
-            let new_points: [SIMD3<Double>] = self.filter_points(pcl: featurePoints.points, referencePoint: referencePoint, yaw: yaw)
 
-            guard let nearest_points = self.nearestPointDetector.getNearestPoint(points: new_points, minPoints: 5, epsilon: 0.3) else
-            {
-                print("There's literally no nearest point bruh")
-                return
-            }
-            self.displayPointCloud([new_points, nearest_points])
-
-//            if new_points.count > 20 {
-//                let firstHalf = Array(new_points[..<20])
-////                let clusters = [new_points, firstHalf]
-//                let clusters = self.dbscan.clusterPoints(points: new_points, minPoints: 10, epsilon: 1)
-//                //            self.displayPointCloud(new_points)
-//                print("Num clusters: " + String(clusters.count))
-//                for (i, cluster) in clusters.enumerated() {
-//                    print("Cluster " + String(i) + ": " + String(cluster.count))
-//                }
-//                self.displayPointCloud(clusters)
-//            } else {
-//                print("less than 20 LLL")
-//            }
-                
-            if (featurePoints.points.count > 5000) {
-                self.arView.session.pause()
-                self.arView.session.run(self.configuration!, options: self.options!)
-                // reset world
-                print("RESETTING SCENE MOTHER FUCKER")
-            }
-        };
-        
-        //            let cameraTransform = frame.camera.transform
-        //            let cameraPosition = extractPosition(from: cameraTransform)
-        //            let referencePoint = SCNVector3(
-        //                frame.camera.transform.columns.3.x,
-        //                frame.camera.transform.columns.3.y,
-        //                frame.camera.transform.columns.3.z
-        //            )
-        
-        // Accessing the raw feature points from LiDAR
-        //        guard let rawFeaturePoints = frame.rawFeaturePoints else { return }
-        
-        //Camera position
-        
-        // Define your reference point here
-        // For example, this could be the camera's current position
-        
-        
-        //        var new_points = rawFeaturePoints.points
-        
-        //        var new_points: [SIMD3<Float>] = []
-        //        for point in rawFeaturePoints.points {
-        //            let scnPoint = SCNVector3(point)
-        //            let distance = distanceBetween(scnPoint, and: referencePoint)
-        //            if distance > 1.5 {
-        //                new_points.append(SIMD3<Float>(point))
-        //            }
-        //        }
-        
-        // Find the closest point
-        //        if let closestPoint = findClosestPoint(to: referencePoint, in: rawFeaturePoints.points) {
-        //        let (closestP, minimumDistance) = findClosestPoint(to: referencePoint, in: new_points)
-        //        if closestP != nil {
-        //            // Do something with the closest point
-        //            // For example, you could update a visual indicator in your AR scene
-        //            print("you are " + String(minimumDistance) + "away from the closest object")
-        //
-        //        }
-        
-        // Prepare for point cloud conversion
-        
-        //        displayPointCloud(new_points)
-        //        let even_newer_points = clusterPoints(points: new_points, minPoints: 10, epsilon: 0.2)
-        //        displayPointCloud(even_newer_points)
-    }
-    
-    func extractPosition(from transform: matrix_float4x4) -> (x: Float, y: Float, z: Float) {
-        let x = transform.columns.3.x
-        let y = transform.columns.3.y
-        let z = transform.columns.3.z
-        return (x, y, z)
-    }
-    
-    func displayPointCloud(_ clusters: [any Sequence<SIMD3<Double>>]) {
-        //        print("Num clusters: " + String(clusters.count))
-        let new_date = Date()
-        //        print("Time diff: " + String(new_date.timeIntervalSinceReferenceDate - date.timeIntervalSinceReferenceDate))
-        //        print("Time: " + String(new_date.timeIntervalSinceReferenceDate))
-        //        print("Cloud num: " + String(cloud_num))
-        date = new_date
+    func displayPointCloud(_ clusters: [any Sequence<SIMD3<Double>>], referencePoint: SCNVector3) {
         cloud_num += 1
                 
         let pointCloudNode = SCNNode()
+        let referencePointSIMD = SIMD3<Double>(referencePoint)
         
         for (i, points) in clusters.enumerated() {
             for point in points {
-                let scaler = CGFloat(2*i + 1)
-                let sphere = SCNSphere(radius: 0.005 * scaler) // adjust radius as needed
+                var radius = 0.02
+                if i == 0 {
+                    radius = 0.005
+                }
+                let sphere = SCNSphere(radius: radius) // adjust radius as needed
                 //                sphere.firstMaterial?.diffuse.contents = UIColor.red // adjust color as needed
                 sphere.firstMaterial?.diffuse.contents = colors[i % colors.count] // adjust color as needed
+
                 let pointNode = SCNNode(geometry: sphere)
-                //                pointNode.position = SCNVector3(point.point)
                 pointNode.position = SCNVector3(point)
+
                 pointCloudNode.addChildNode(pointNode)
                 
             }
         }
-        
-        pointCloudNode.name = String(new_date.timeIntervalSinceReferenceDate)
-        
+                
         DispatchQueue.main.async {
             self.arView.scene.rootNode.enumerateChildNodes { (node, stop) in
                 node.removeFromParentNode()
@@ -272,30 +240,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             self.arView.scene.rootNode.addChildNode(pointCloudNode)
         }
     }
-    
-    
-//    func findClosestPoint(to referencePoint: SCNVector3, in points: [vector_float3]) -> (SCNVector3?, Float) {
-//        guard !points.isEmpty else { return (nil,Float.greatestFiniteMagnitude) }
-//        
-//        var closestPoint: SCNVector3?
-//        var minimumDistance = Float.greatestFiniteMagnitude
-//        
-//        for point in points {
-//            let scnPoint = SCNVector3(point)
-//            let distance = distanceBetween(scnPoint, and: referencePoint)
-//            if distance < minimumDistance {
-//                minimumDistance = distance
-//                closestPoint = scnPoint
-//            }
-//        }
-//        
-//        print("Num points: " + String(points.count))
-//        //        print("Minimum distance: " + String(minimumDistance))
-//        //        print(referencePoint)
-//        //        print(closestPoint)
-//        
-//        return (closestPoint, minimumDistance)
-//    }
     
     func distanceBetween(_ point1: SCNVector3, and point2: SCNVector3) -> Float {
         let dx = point1.x - point2.x
@@ -311,6 +255,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     func distanceBetween2D(_ point1: SIMD3<Float>, and point2: SIMD3<Float>) -> Float {
+        let dx = point1.x - point2.x
+        let dz = point1.z - point2.z
+        return sqrt(dx*dx + dz*dz)
+    }
+
+    func distanceBetween2D(_ point1: SIMD3<Double>, and point2: SIMD3<Double>) -> Double {
         let dx = point1.x - point2.x
         let dz = point1.z - point2.z
         return sqrt(dx*dx + dz*dz)
