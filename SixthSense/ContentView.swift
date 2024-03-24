@@ -7,22 +7,6 @@
 
 import SwiftUI
 
-//struct ContentView: View {
-//    var body: some View {
-//        VStack {
-//            Image(systemName: "globe")
-//                .imageScale(.large)
-//                .foregroundStyle(.tint)
-//            Text("Hello, world!")
-//        }
-//        .padding()
-//    }
-//}
-//
-//#Preview {
-//    ContentView()
-//}
-
 struct ContentView: View {
     var body: some View {
         VStack {
@@ -33,16 +17,9 @@ struct ContentView: View {
             ViewContainer()
                 .edgesIgnoringSafeArea(.all)
         }
-//        ViewContainer()
-//            .edgesIgnoringSafeArea(.all)
     }
 }
 
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
 #Preview {
     ContentView()
 }

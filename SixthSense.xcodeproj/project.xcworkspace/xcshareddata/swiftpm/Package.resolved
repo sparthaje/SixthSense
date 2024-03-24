@@ -1,0 +1,24 @@
+{
+  "originHash" : "e93adf9a4d031aedf7296bce57ded1a0a34a3455a13fb06baf0badc6a96345bf",
+  "pins" : [
+    {
+      "identity" : "dbscan",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NSHipster/DBSCAN",
+      "state" : {
+        "revision" : "785f9dde344ead54132fed58611a35fec1fe82e5",
+        "version" : "0.0.2"
+      }
+    },
+    {
+      "identity" : "kdtree",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Bersaelor/KDTree",
+      "state" : {
+        "revision" : "35d14064d48d92a0c2c1215b93a3118f558b2e6b",
+        "version" : "1.4.2"
+      }
+    }
+  ],
+  "version" : 3
+}

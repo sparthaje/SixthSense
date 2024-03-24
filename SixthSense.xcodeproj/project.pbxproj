@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F2A2AA12BAF9E4C00B52A2E /* DBSCAN in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */; };
+		9F2A2AA32BAFA35100B52A2E /* DBScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2A2AA22BAFA35100B52A2E /* DBScan.swift */; };
+		9F2A2AA52BAFA35900B52A2E /* KDTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2A2AA42BAFA35900B52A2E /* KDTree.swift */; };
+		9F2A2AA82BAFA3BF00B52A2E /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AA72BAFA3BF00B52A2E /* KDTree */; };
 		9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */; };
 		9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */; };
 		EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA81DAF62BAF402F0024E8CB /* SixthSenseApp.swift */; };
@@ -16,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9F2A2AA22BAFA35100B52A2E /* DBScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBScan.swift; sourceTree = "<group>"; };
+		9F2A2AA42BAFA35900B52A2E /* KDTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KDTree.swift; sourceTree = "<group>"; };
 		9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAudioManager.swift; sourceTree = "<group>"; };
 		EA81DAF32BAF402F0024E8CB /* SixthSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SixthSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -31,6 +37,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F2A2AA12BAF9E4C00B52A2E /* DBSCAN in Frameworks */,
+				9F2A2AA82BAFA3BF00B52A2E /* KDTree in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +71,8 @@
 				EA81DAFD2BAF40300024E8CB /* Preview Content */,
 				9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */,
 				9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */,
+				9F2A2AA22BAFA35100B52A2E /* DBScan.swift */,
+				9F2A2AA42BAFA35900B52A2E /* KDTree.swift */,
 			);
 			path = SixthSense;
 			sourceTree = "<group>";
@@ -91,6 +101,10 @@
 			dependencies = (
 			);
 			name = SixthSense;
+			packageProductDependencies = (
+				9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */,
+				9F2A2AA72BAFA3BF00B52A2E /* KDTree */,
+			);
 			productName = SixthSense;
 			productReference = EA81DAF32BAF402F0024E8CB /* SixthSense.app */;
 			productType = "com.apple.product-type.application";
@@ -119,6 +133,10 @@
 				Base,
 			);
 			mainGroup = EA81DAEA2BAF402F0024E8CB;
+			packageReferences = (
+				9F2A2A9F2BAF9E4C00B52A2E /* XCRemoteSwiftPackageReference "DBSCAN" */,
+				9F2A2AA62BAFA3BF00B52A2E /* XCRemoteSwiftPackageReference "KDTree" */,
+			);
 			productRefGroup = EA81DAF42BAF402F0024E8CB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -146,8 +164,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */,
+				9F2A2AA32BAFA35100B52A2E /* DBScan.swift in Sources */,
 				9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */,
 				EA81DAF92BAF402F0024E8CB /* ContentView.swift in Sources */,
+				9F2A2AA52BAFA35900B52A2E /* KDTree.swift in Sources */,
 				EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -371,6 +391,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9F2A2A9F2BAF9E4C00B52A2E /* XCRemoteSwiftPackageReference "DBSCAN" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/NSHipster/DBSCAN";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.2;
+			};
+		};
+		9F2A2AA62BAFA3BF00B52A2E /* XCRemoteSwiftPackageReference "KDTree" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Bersaelor/KDTree";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9F2A2AA02BAF9E4C00B52A2E /* DBSCAN */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F2A2A9F2BAF9E4C00B52A2E /* XCRemoteSwiftPackageReference "DBSCAN" */;
+			productName = DBSCAN;
+		};
+		9F2A2AA72BAFA3BF00B52A2E /* KDTree */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F2A2AA62BAFA3BF00B52A2E /* XCRemoteSwiftPackageReference "KDTree" */;
+			productName = KDTree;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EA81DAEB2BAF402F0024E8CB /* Project object */;
 }

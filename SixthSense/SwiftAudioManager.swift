@@ -2,7 +2,7 @@
 //  SpatialAudioManager.swift
 //  SixthSense
 //
-//  Created by Arushi Shah on 3/23/24.
+//  Created by Srikar Gouru on 3/23/24.
 //
 
 import Foundation
