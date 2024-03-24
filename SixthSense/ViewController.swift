@@ -31,13 +31,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var configuration: ARWorldTrackingConfiguration? = nil;
     var options: ARSession.RunOptions? = nil;
     var nearestPointDetector = NearestPointDetector()
-
+    
     var previousFrame: ARFrame?
     let model = GenerativeModel(name: "gemini-pro-vision", apiKey: "AIzaSyATZ4h33XqCyMN3yj50vvXupQLAsXD2wIk")
     let speechSynthesizer = AVSpeechSynthesizer()
     let soundPlayer = SoundPlayer()
     var givingContext = false
-    var toggleSpatialAudio = false
+    var isPlaying = false
+    var announced = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +49,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         arView.delegate = self
         
         // Check if LiDAR is available
-        //        spatialAudioManager.playSound(from: <#T##SCNVector3#>, with: <#T##URL#>);
         guard ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) else {
             print("LiDAR not available on this device")
             return
@@ -72,22 +72,57 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a new button
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: screenRect.width, height: buttonHeight))
         button.backgroundColor = .black
-        button.setTitle("General Context", for: .normal)
+        button.setTitle("Tap for Key Object Awareness, Hold for Environmental Context Awareness", for: .normal)
         button.addTarget(self, action: #selector(topButtonTapped), for: .touchUpInside)
+        button.titleLabel?.lineBreakMode = .byWordWrapping
         view.addSubview(button)
+
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        button.addGestureRecognizer(longPressGesture)
+
+        longPressGesture.minimumPressDuration = 2  // Duration in seconds
+        longPressGesture.allowableMovement = 10
 
         // Create a new button
         let button2 = UIButton(frame: CGRect(x: 0, y: buttonHeight, width: screenRect.width, height: buttonHeight))
         button2.backgroundColor = .black
-        button2.setTitle("Key Objects", for: .normal)
-        button2.addTarget(self, action: #selector(bottomButtonTapped), for: .touchUpInside)
+        button2.setTitle("Toggle Pings", for: .normal)
+        button2.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
         view.addSubview(button2)
 
         let dividerHeight: CGFloat = 2  // You can adjust the thickness of the divider here
             let divider = UIView(frame: CGRect(x: 0, y: buttonHeight - dividerHeight / 2, width: screenRect.width, height: dividerHeight))
             divider.backgroundColor = .white
             view.addSubview(divider)
+        
+        let speechUtterance = AVSpeechUtterance(string: "Welcome! You have activated your sixth sense! Tap the bottom half of your screen to toggle echo-navigation. For context awareness, tap the top half for key objects and hold it for context for your surroundings. ")
+        speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+        speechSynthesizer.speak(speechUtterance)
     }
+    
+    @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
+        // Perform your desired action here
+        if gesture.state == .began {
+            if (previousFrame != nil) {
+                let buffer = previousFrame!.capturedImage;
+                let img = UIImage(ciImage: CIImage(cvPixelBuffer: buffer));
+                let prompt = "Given the following field of vision, contextualize the environment and provide what the environment could be (living room, classroom, conference room, kitchen, hallway). Keep responses short and within 2 sentences."
+                givingContext = true
+                Task {
+                    let result = await call_gemini(model: model, img: img, prompt: prompt)!
+                    print("API Response: \(result ?? "No output")")
+                    //givingContext = true
+                    let speechUtterance = AVSpeechUtterance(string: result)
+                    speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+                    speechSynthesizer.speak(speechUtterance)
+                }
+                givingContext = false
+                previousFrame = nil;
+            }
+            print("General Context Button tapped!")
+        }
+    }
+
     
     @objc func bottomButtonTapped() {
         print("Clicked bottom button")
@@ -96,7 +131,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let buffer = previousFrame!.capturedImage;
             let img = UIImage(ciImage: CIImage(cvPixelBuffer: buffer));
             givingContext = true
-            let speechUtterance = AVSpeechUtterance(string: "Stop!")
+            let speechUtterance = AVSpeechUtterance(string: "Stop! Finding the closest things to you")
             speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
             speechSynthesizer.speak(speechUtterance)
 
@@ -113,18 +148,23 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             previousFrame = nil;
         }
     }
+
     @objc func topButtonTapped() {
-        print("Clicked top button")
         // Perform your desired action here
+        //toggle
         if (previousFrame != nil) {
             let buffer = previousFrame!.capturedImage;
             let img = UIImage(ciImage: CIImage(cvPixelBuffer: buffer));
-            let prompt = "Given the following field of vision, contextualize the environment and provide what the environment could be (living room, classroom, conference room, kitchen, hallway). Keep responses short and within 2 sentences."
+            givingContext = true
+            let speechUtterance = AVSpeechUtterance(string: "Stop! Getting key objects visible")
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+            speechSynthesizer.speak(speechUtterance)
+
+            let prompt = "What is the closest key object in the field of view: people, chair, door, and table. Also provide its relative location in the frame (left, center, right). Limit response to only 1 sentence."
             givingContext = true
             Task {
                 let result = await call_gemini(model: model, img: img, prompt: prompt)!
                 print("API Response: \(result ?? "No output")")
-                //givingContext = true
                 let speechUtterance = AVSpeechUtterance(string: result)
                 speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
                 speechSynthesizer.speak(speechUtterance)
@@ -132,8 +172,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             givingContext = false
             previousFrame = nil;
         }
+        print("Short context Button tapped!")
     }
-    
+
+    @objc func toggleButtonTapped() {
+        if isPlaying {
+            soundPlayer.stopPlaying()
+            isPlaying = false
+            //soundPlayer.currentTime = 0
+        } else {
+//            playPing(angle: angle, depth: depth)
+            isPlaying = true
+        }
+        var state = isPlaying ? "on" : "off"
+        let speechUtterance = AVSpeechUtterance(string: "Toggled echo-navigation to " + state)
+        speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US") // Set the language
+        speechSynthesizer.speak(speechUtterance)
+    }
+
     func call_gemini(model: GenerativeModel, img: UIImage?, prompt: String) async -> String? {
         do {
             let response = try await model.generateContent(prompt, img!);
@@ -178,7 +234,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 //            print("Found n nearest points " + String(nearest_points.count))
 //            self.displayPointCloud([new_points, nearest_points], referencePoint: referencePoint)
 
-//            if self.cloud_num % 100 == 0 {
             var num_points = 0.0
             var avg_x = 0.0
             var avg_z = 0.0
@@ -195,7 +250,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             ping_angle = atan2(sin(ping_angle), cos(ping_angle))
             
             let ping_frequency = 1.5
-            if Date().timeIntervalSince(self.last_ping_date) > ping_frequency {
+            if self.isPlaying && Date().timeIntervalSince(self.last_ping_date) > ping_frequency {
                 self.playPing(angle: Double(ping_angle), depth: magnitude)
                 self.last_ping_date = Date()
             }

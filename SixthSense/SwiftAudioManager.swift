@@ -26,4 +26,9 @@ class SoundPlayer {
             }
         }
     }
+    
+    func stopPlaying() {
+        audioPlayer?.stop()
+    }
+    
 }

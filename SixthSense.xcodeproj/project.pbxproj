@@ -11,6 +11,7 @@
 		9F2A2AA82BAFA3BF00B52A2E /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AA72BAFA3BF00B52A2E /* KDTree */; };
 		9F2A2AAB2BB0492500B52A2E /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2A2AAA2BB0492500B52A2E /* GoogleGenerativeAI */; };
 		9F2A2AAD2BB04FFF00B52A2E /* biwo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9F2A2AAC2BB04FFF00B52A2E /* biwo.m4a */; };
+		9F2A2AAF2BB05C0C00B52A2E /* eye.png in Resources */ = {isa = PBXBuildFile; fileRef = 9F2A2AAE2BB05C0C00B52A2E /* eye.png */; };
 		9FB07A9D2BAF4A08005B64A5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */; };
 		9FB07A9F2BAF4A2E005B64A5 /* SwiftAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */; };
 		EA81DAF72BAF402F0024E8CB /* SixthSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA81DAF62BAF402F0024E8CB /* SixthSenseApp.swift */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		9F2A2AA22BAFA35100B52A2E /* NearestPointDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearestPointDetector.swift; sourceTree = "<group>"; };
 		9F2A2AAC2BB04FFF00B52A2E /* biwo.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = biwo.m4a; sourceTree = "<group>"; };
+		9F2A2AAE2BB05C0C00B52A2E /* eye.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye.png; sourceTree = "<group>"; };
 		9FB07A9C2BAF4A08005B64A5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9FB07A9E2BAF4A2E005B64A5 /* SwiftAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAudioManager.swift; sourceTree = "<group>"; };
 		EA81DAF32BAF402F0024E8CB /* SixthSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SixthSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				EA81DAFE2BAF40300024E8CB /* Preview Assets.xcassets */,
+				9F2A2AAE2BB05C0C00B52A2E /* eye.png */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -153,6 +156,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA81DAFF2BAF40300024E8CB /* Preview Assets.xcassets in Resources */,
+				9F2A2AAF2BB05C0C00B52A2E /* eye.png in Resources */,
 				9F2A2AAD2BB04FFF00B52A2E /* biwo.m4a in Resources */,
 				EA81DAFB2BAF40300024E8CB /* Assets.xcassets in Resources */,
 			);
