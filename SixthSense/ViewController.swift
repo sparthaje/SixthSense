@@ -28,7 +28,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     let colors = [UIColor.red, UIColor.green, UIColor.orange, UIColor.blue, UIColor.purple, UIColor.cyan]
     var configuration: ARWorldTrackingConfiguration? = nil;
     var options: ARSession.RunOptions? = nil;
-    var dbscan = DBScan()
     var nearestPointDetector = NearestPointDetector()
     
     override func viewDidLoad() {
@@ -69,35 +68,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         arView.session.getCurrentWorldMap { world_map, e in
             guard let featurePoints = world_map?.rawFeaturePoints else {return}
-//            print("Num anchors: " + String((world_map?.anchors.count)!))
-//            var anchor_points: [SIMD3<Double>] = []
-//            for anchor in world_map!.anchors {
-//                if let planeAnchor = anchor as? ARPlaneAnchor {
-//                    print("It's a plane anchor")
-//                    print(planeAnchor.classification)
-//                }
-//                else if let meshAnchor = anchor as? ARMeshAnchor {
-//                    print("It's a mesh anchor")
-////                     print("Classification: " + String(meshAnchor.classification))
-//                }
-//                else if let bodyAnchor = anchor as? ARBodyAnchor {
-//                    print("It's a body anchor")
-////                    print(bodyAnchor.classification)
-////                    print("Classification: " + String(bodyAnchor.classification))
-//                }
-//                let position = anchor.transform.columns.3
-//                let simd_pos = SIMD3<Double>(Double(position.x), Double(position.y), Double(position.z))
-//                print(simd_pos)
-//                anchor_points.append(simd_pos)
-////                else if let environmentProbeAnchor = anchor as? AREnvironmentProbeAnchor {
-////                    print("It's an environment probe anchor")
-////                }
-//            }
-//
-//            let clusters = [anchor_points]
-//            self.displayPointCloud(clusters)
-//            
-//            return
 
             let referencePoint = SCNVector3(
                 frame.camera.transform.columns.3.x,
@@ -111,30 +81,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             guard let nearest_points = self.nearestPointDetector.getNearestPoint(points: new_points, minPoints: 7, epsilon: 0.3) else
             {
                 print("There's literally no nearest point bruh")
-    //            self.displayPointCloud([new_points, nearest_points])
                 self.displayPointCloud([new_points], referencePoint: referencePoint)
                 return
             }
-//            self.displayPointCloud([new_points, nearest_points])
             print("Found n nearest points " + String(nearest_points.count))
             self.displayPointCloud([new_points, nearest_points], referencePoint: referencePoint)
-
-//            if new_points.count > 20 {
-//                let firstHalf = Array(new_points[..<20])
-////                let clusters = [new_points, firstHalf]
-//                let clusters = self.dbscan.clusterPoints(points: new_points, minPoints: 10, epsilon: 1)
-//                //            self.displayPointCloud(new_points)
-//                print("Num clusters: " + String(clusters.count))
-//                for (i, cluster) in clusters.enumerated() {
-//                    print("Cluster " + String(i) + ": " + String(cluster.count))
-//                }
-//                self.displayPointCloud(clusters)
-//            } else {
-//                print("less than 20 LLL")
-//            }
                
             if Date().timeIntervalSince(self.reset_date) > 20 {
-//            if (featurePoints.points.count > 5000) {
                 self.arView.session.pause()
                 self.arView.session.run(self.configuration!, options: self.options!)
                 // reset world
@@ -179,7 +132,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             if distance > 2.0 {
                 continue
             }
-//            
             if distance < minDistance {
                 minDistance = distance
             }
@@ -189,7 +141,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 //        print("Num original points: " + String(num_original_points))
 //        print("Num angle filtered points: " + String(num_angle_filtered_points))
 //        print("Num ground filtered points: " + String(num_ground_filtered_points))
-        print("Num fully filtered points: " + String(new_points.count))
+//        print("Num fully filtered points: " + String(new_points.count))
 //        print("Min distance: " + String(minDistance))
         new_points.sort { (pointA, pointB) -> Bool in
             let d1 = self.distanceBetween2D(SCNVector3(
